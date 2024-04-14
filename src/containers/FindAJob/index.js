@@ -211,7 +211,7 @@ setResults(data.Score)
   .catch(error => console.error('Error:', error));
              
         }
-        if(result <= 30)
+        if(result < 50)
         {
             enqueueSnackbar(`Dear Candiditate your score is ${result}, therefore,  You are not eligible  for this job`, {
                 variant: "error",
@@ -220,7 +220,6 @@ setResults(data.Score)
                     horizontal: 'right',
                 }
             })
-            setResults("")
         }
         else{
             enqueueSnackbar(`Congratulation your score is ${result}, therefore, you have successfully applied to this job`, {
@@ -230,12 +229,10 @@ setResults(data.Score)
                     horizontal: 'right',
                 }
             })
-            setResults("")
-
         }
 
     }
-
+    setResults("");
     return (
         <Box component="div">
             <Box component="div" sx={{
