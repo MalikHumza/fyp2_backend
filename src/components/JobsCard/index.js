@@ -24,6 +24,8 @@ const JobsCard = ({
   handleAddFavourite,
   handleRemoveFavourite,
   handleApplyJob,
+  isButtonDisabled,
+  setButtonDisabled
 }) => {
   const classes = useStyles();
   const { user } = useContext(AppContext);
@@ -58,7 +60,12 @@ const JobsCard = ({
     }
   };
 
-
+  const handleApplyButtonClick = async (item) => {
+    const success = await handleApplyJob(item._id, item.companyId, setButtonDisabled);
+    if (success) {
+      setButtonDisabled(true); // Disable the button after successful application
+    }
+  };
   return (
     <Box component="div">
       <Grid container>
@@ -297,21 +304,14 @@ const JobsCard = ({
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <IconButton
-                    disabled={
-                      selectedJob?.appliedCandidateIds?.includes(user?._id)
-                        ? true
-                        : false
-                    }
-                    onClick={() =>
-                      handleApplyJob(selectedJob?._id, selectedJob?.companyId)
-                    }
-                    className={classes.heroBtn}
-                    width={"30%"}
-                  >
-                    {selectedJob?.appliedCandidateIds?.includes(user?._id)
-                      ? "Applied"
-                      : "Apply now"}
-                  </IconButton>
+  disabled={isButtonDisabled}
+  onClick={() => handleApplyButtonClick(selectedJob)}
+  className={classes.heroBtn}
+  width={"30%"}
+>
+  {isButtonDisabled ? "Applied" : "Apply now"}
+</IconButton>
+
                   <Box
                     component="div"
                     sx={{

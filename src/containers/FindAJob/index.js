@@ -20,6 +20,7 @@ const FindAJob = () => {
     let searchValue = location?.state?.searchValue
 
     const [jobsData, setJobsData] = useState([]);
+    const [isButtonDisabled, setButtonDisabled] = useState(false); 
 
     const [result, setResults] = useState("");
 
@@ -184,58 +185,75 @@ const FindAJob = () => {
                     vertical: 'bottom',
                     horizontal: 'right',
                 }
-            })
-            return <Navigate to="/login" replace />
+            });
+            return <Navigate to="/login" replace />;
         } else if (user && user.role === "Organization") {
-            enqueueSnackbar("organization can not apply for jobs", {
+            enqueueSnackbar("Organization cannot apply for jobs", {
                 variant: "error",
                 anchorOrigin: {
                     vertical: 'bottom',
                     horizontal: 'right',
                 }
-            })
-        }else {
-            
-
-    fetch('https://fypflaskbackend.onrender.com/analyze_resume_and_job', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ job_id: jobId, user_id:user?._id })
-  })
-  .then(response => response.json())
-  .then(data => {
-setResults(data.Score)
-  })
-  .catch(error => console.error('Error:', error));
-             
+            });
+            return;
         }
-        if(result < 50)
-        {
-            enqueueSnackbar(`Dear Candiditate your score is ${result}, therefore,  You are not eligible  for this job`, {
+    
+        try {
+            const response = await fetch('https://fypflaskbackend.onrender.com/analyze_resume_and_job', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ job_id: jobId, user_id: user?._id })
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to fetch score');
+            }
+    
+            const data = await response.json();
+            const score = parseFloat(data.Score);
+    
+            if (isNaN(score)) {
+                throw new Error('Invalid score received');
+            }
+    
+            if (score < 50) {
+                enqueueSnackbar(`Dear Candidate, your score is ${score}, therefore, you are not eligible for this job`, {
+                    variant: "error",
+                    anchorOrigin: {
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    }
+                });
+                return;
+            } else {
+                enqueueSnackbar(`Congratulations, your score is ${score}, therefore, you have successfully applied to this job`, {
+                    variant: "success",
+                    anchorOrigin: {
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    }
+                });
+                // Disable the "Apply Now" button here
+                // Optionally, you can also update UI state to reflect successful application
+                setButtonDisabled(true);
+    
+                // Make the actual application request
+                // You might want to implement this part
+                // await applyJob(jobId, companyId);
+            }
+        } catch (error) {
+            enqueueSnackbar(error.message, {
                 variant: "error",
                 anchorOrigin: {
                     vertical: 'bottom',
                     horizontal: 'right',
                 }
-            })
-            setResults("");
-
+            });
         }
-        else{
-            enqueueSnackbar(`Congratulation your score is ${result}, therefore, you have successfully applied to this job`, {
-                variant: "success",
-                anchorOrigin: {
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                }
-            })
-            setResults("");
-
-        }
-
-    }
+    };
+    
     return (
         <Box component="div">
             <Box component="div" sx={{
@@ -299,7 +317,14 @@ setResults(data.Score)
                     </Typography>
                 </Box>
                 <Box sx={{ marginTop: "30px" }}>
-                    <JobsCard job={jobsData} handleAddFavourite={handleAddFavourite} handleRemoveFavourite={handleRemoveFavourite} handleApplyJob={handleApplyJob} />
+                <JobsCard
+        job={jobsData}
+        handleAddFavourite={handleAddFavourite}
+        handleRemoveFavourite={handleRemoveFavourite}
+        handleApplyJob={handleApplyJob}
+        isButtonDisabled={isButtonDisabled} // Pass the isButtonDisabled state
+        setButtonDisabled={setButtonDisabled} // Pass the setButtonDisabled function
+    />
                 </Box>
             </Container>
         </Box>
