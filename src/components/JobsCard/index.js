@@ -61,7 +61,7 @@ const JobsCard = ({
   };
 
   const handleApplyButtonClick = async (item) => {
-    const success = await handleApplyJob(item._id, item.companyId, setButtonDisabled);
+    const success = await handleApplyJob(item._id, item.companyId, setButtonDisabled, selectedJob?._id, selectedJob?.companyId);
     if (success) {
       setButtonDisabled(true); // Disable the button after successful application
     }
@@ -304,12 +304,12 @@ const JobsCard = ({
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <IconButton
-  disabled={isButtonDisabled}
+  disabled={selectedJob?.appliedCandidateIds?.includes(user?._id) ? true : false}
   onClick={() => handleApplyButtonClick(selectedJob)}
   className={classes.heroBtn}
   width={"30%"}
 >
-  {isButtonDisabled ? "Applied" : "Apply now"}
+  {selectedJob?.appliedCandidateIds?.includes(user?._id) ? "Applied" : "Apply now"}
 </IconButton>
 
                   <Box
