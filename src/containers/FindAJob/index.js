@@ -20,6 +20,9 @@ const FindAJob = () => {
     let searchValue = location?.state?.searchValue
 
     const [jobsData, setJobsData] = useState([]);
+
+    const [result, setResults] = useState("");
+
     const [search, setSearch] = useState({
         jobTitle: "",
         location: "",
@@ -192,57 +195,43 @@ const FindAJob = () => {
                 }
             })
         }else {
-            try {
-                if (selectedCoverLetter && selectedTemplate) {
-                    let payload = {
-                        jobId: jobId,
-                        userId: user?._id,
-                        companyId: companyId
-                    }
-                    const response = await applyJob(payload)
-                    if (response.data.status === "ok") {
-                        enqueueSnackbar(response.data.message, {
-                            variant: "success",
-                            anchorOrigin: {
-                                vertical: 'bottom',
-                                horizontal: 'right',
-                            }
-                        })
-                        getJobsData(
-                            searchValue?.keyword ? searchValue?.keyword : "",
-                            searchValue?.location ? searchValue?.location : "",
-                            searchValue?.experience ? searchValue?.experience : "",
-                            searchValue?.jobDescription ? searchValue?.jobDescription : ""
-                        )
-                    } else {
-                        enqueueSnackbar(response.data.message, {
-                            variant: "error",
-                            anchorOrigin: {
-                                vertical: 'bottom',
-                                horizontal: 'right',
-                            }
-                        })
-                    }
-                }else{
-                    enqueueSnackbar("Please Select Resume & Cover Letter Template First", {
-                        variant: "error",
-                        anchorOrigin: {
-                            vertical: 'bottom',
-                            horizontal: 'right',
-                        }
-                    })
-                }
-                
-            } catch (error) {
-                enqueueSnackbar(error.message, {
-                    variant: "error",
-                    anchorOrigin: {
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                    }
-                })
+            
 
-            }
+    fetch('https://fypflaskbackend.onrender.com/analyze_resume_and_job', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ job_id: jobId, user_id:user?._id })
+  })
+  .then(response => response.json())
+  .then(data => {
+setResults(data.Score)
+  })
+  .catch(error => console.error('Error:', error));
+             
+        }
+        if(result <= 30)
+        {
+            enqueueSnackbar(`Dear Candiditate your score is ${result}, therefore,  You are not eligible  for this job`, {
+                variant: "error",
+                anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }
+            })
+            setResults("")
+        }
+        else{
+            enqueueSnackbar(`Congratulation your score is ${result}, therefore, you have successfully applied to this job`, {
+                variant: "success",
+                anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }
+            })
+            setResults("")
+
         }
 
     }
