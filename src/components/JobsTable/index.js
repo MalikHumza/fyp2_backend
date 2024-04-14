@@ -96,7 +96,10 @@ const JobsTable = ({ jobs, getLatestJobs, jobType }) => {
                                 <TableCell >{job?.minSalary + " To " + job?.maxSalary}</TableCell>
                                 <TableCell >{job?.date}</TableCell>
                                 <TableCell >
-                                    <IconButton onClick={() => handleApplyJob(job?._id, job?.companyId)} className={classes.heroBtn}>
+                                    <IconButton onClick={() => handleApplyJob(job?._id, job?.companyId)} 
+                                        className={classes.heroBtn}
+                                        disabled={job?.appliedCandidateIds?.includes(user?._id) ? "Applied" : "Apply Now"}
+                                    >
                                         {
                                             job?.appliedCandidateIds?.includes(user?._id) ?
                                                 "Applied"
