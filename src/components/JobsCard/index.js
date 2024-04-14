@@ -310,7 +310,7 @@ const JobsCard = ({
                   >
                     {selectedJob?.appliedCandidateIds?.includes(user?._id)
                       ? "Applied"
-                      : "Apply now"}
+                      : "Apply now.."}
                   </IconButton>
                   <Box
                     component="div"
