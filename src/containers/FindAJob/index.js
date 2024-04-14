@@ -220,6 +220,8 @@ setResults(data.Score)
                     horizontal: 'right',
                 }
             })
+            setResults("");
+
         }
         else{
             enqueueSnackbar(`Congratulation your score is ${result}, therefore, you have successfully applied to this job`, {
@@ -229,10 +231,11 @@ setResults(data.Score)
                     horizontal: 'right',
                 }
             })
+            setResults("");
+
         }
 
     }
-    setResults("");
     return (
         <Box component="div">
             <Box component="div" sx={{
